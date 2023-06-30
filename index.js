@@ -7,6 +7,28 @@ const dotenv = require('dotenv');
 var compiler = require('compilex');
 var options = { stats: true }; //prints stats on console 
 compiler.init(options);
+const { Server } = require("socket.io");
+
+const io = new Server(2000, {
+    cors: {
+        origin: "http://localhost:3000",
+        methods: ["GET", "POST"],
+    },
+})
+
+//To connect to soket io
+io.on('connection', (socket) => {
+    //For connection
+    console.log(`User Connected: ${socket.id} \n`);
+    //For sending message
+    socket.on("send_message", (data, room) => {
+        socket.to(room).emit("receive_message", data)
+    })
+    //For joining room
+    socket.on("join-room", room => {
+        socket.join(room)
+    })
+})
 
 const path = require("path");
 const { readdirSync, rmSync } = require('fs');
